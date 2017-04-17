@@ -1,0 +1,240 @@
+<div class="apidocDiv">
+<style>
+/*csslint
+*/
+.apidocDiv {
+    background: #fff;
+    font-family: Arial, Helvetica, sans-serif;
+}
+.apidocDiv a[href] {
+    color: #33f;
+    font-weight: bold;
+    text-decoration: none;
+}
+.apidocDiv a[href]:hover {
+    text-decoration: underline;
+}
+.apidocCodeCommentSpan {
+    background: #bbf;
+    color: #000;
+    display: block;
+}
+.apidocCodeKeywordSpan {
+    color: #d00;
+    font-weight: bold;
+}
+.apidocCodePre {
+    background: #eef;
+    border: 1px solid;
+    color: #777;
+    padding: 5px;
+    white-space: pre-wrap;
+}
+.apidocFooterDiv {
+    margin-top: 20px;
+    text-align: center;
+}
+.apidocModuleLi {
+    margin-top: 10px;
+}
+.apidocSectionDiv {
+    border-top: 1px solid;
+    margin-top: 20px;
+}
+.apidocSignatureSpan {
+    color: #777;
+    font-weight: bold;
+}
+</style>
+<h1>api documentation for
+    <a
+
+        href="https://github.com/calvinmetcalf/copyfiles#readme"
+
+    >copyfiles (v1.2.0)</a>
+</h1>
+<h4>copy some files</h4>
+<div class="apidocSectionDiv"><a
+    href="#apidoc.tableOfContents"
+    id="apidoc.tableOfContents"
+><h1>table of contents</h1></a><ol>
+
+    <li class="apidocModuleLi"><a href="#apidoc.module.copyfiles">module copyfiles</a><ol>
+
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.copyfiles.copyfiles">
+            function <span class="apidocSignatureSpan"></span>copyfiles
+            <span class="apidocSignatureSpan">(args, config, callback)</span>
+            </a>
+
+        </li>
+
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.copyfiles.toString">
+            function <span class="apidocSignatureSpan">copyfiles.</span>toString
+            <span class="apidocSignatureSpan">()</span>
+            </a>
+
+        </li>
+
+    </ol></li>
+
+    <li class="apidocModuleLi"><a href="#apidoc.module.copyfiles.toString">module copyfiles.toString</a><ol>
+
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.copyfiles.toString.toString">
+            function <span class="apidocSignatureSpan">copyfiles.</span>toString
+            <span class="apidocSignatureSpan">()</span>
+            </a>
+
+        </li>
+
+    </ol></li>
+
+</ol></div>
+
+<div class="apidocSectionDiv">
+<h1><a href="#apidoc.module.copyfiles" id="apidoc.module.copyfiles">module copyfiles</a></h1>
+
+
+    <h2>
+        <a href="#apidoc.element.copyfiles.copyfiles" id="apidoc.element.copyfiles.copyfiles">
+        function <span class="apidocSignatureSpan"></span>copyfiles
+        <span class="apidocSignatureSpan">(args, config, callback)</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">function copyFiles(args, config, callback) {
+  if (typeof config === &#x27;function&#x27;) {
+    callback = config;
+    config = {
+      up:0
+    };
+  }
+  if (typeof config !== &#x27;object&#x27; &#x26;&#x26; config) {
+    config = {
+      up: config
+    };
+  }
+  var opts = config.up || 0;
+  var soft = config.soft;
+  if (typeof callback !== &#x27;function&#x27;) {
+    throw new Error(&#x27;callback is not optional&#x27;);
+  }
+  var input = args.slice();
+  var outDir = input.pop();
+  var globOpts = {};
+  if (config.exclude) {
+    globOpts.ignore = config.exclude;
+  }
+  if (config.all) {
+    globOpts.dot = true;
+  }
+  toStream(input)
+  .pipe(through(function (pathName, _, next) {
+    var self = this;
+    glob(pathName, globOpts, function (err, paths) {
+      if (err) {
+        return next(err);
+      }
+      paths.forEach(function (unglobbedPath) {
+        self.push(unglobbedPath);
+      });
+      next();
+    });
+  }))
+  .pipe(through(function (pathName, _, next) {
+    fs.stat(pathName, function (err, pathStat) {
+      if (err) {
+        return next(err);
+      }
+      var outName = path.join(outDir, dealWith(pathName, opts));
+      function done(){
+        mkdirp(path.dirname(outName), function (err) {
+          if (err) {
+            return next(err);
+          }
+          next(null, pathName);
+        });
+      }
+      if (pathStat.isDirectory()) {
+        return next();
+      }
+      if (!pathStat.isFile()) {
+        return next(new Error(&#x27;how can it be neither file nor folder?&#x27;))
+      }
+      if (!soft) {
+        return done();
+      }
+      fs.stat(outName, function(err){
+        if(!err){
+          //file exists
+          return next()
+        }
+        if (err.code === &#x27;ENOENT&#x27;) {
+          //file does not exist
+          return done();
+        }
+        // other error
+        return next(err)
+      })
+    });
+  }))
+  .pipe(through(function (pathName, _, next) {
+    var outName = path.join(outDir, dealWith(pathName, opts));
+    fs.createReadStream(pathName)
+      .pipe(fs.createWriteStream(outName))
+      .on(&#x27;error&#x27;, next)
+      .on(&#x27;finish&#x27;, next);
+  }))
+  .on(&#x27;error&#x27;, callback)
+  .on(&#x27;finish&#x27;, callback);
+}</pre></li>
+    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
+    </ul>
+
+
+
+    <h2>
+        <a href="#apidoc.element.copyfiles.toString" id="apidoc.element.copyfiles.toString">
+        function <span class="apidocSignatureSpan">copyfiles.</span>toString
+        <span class="apidocSignatureSpan">()</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">toString = function () {
+    return text;
+}</pre></li>
+    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
+    </ul>
+
+
+</div>
+
+<div class="apidocSectionDiv">
+<h1><a href="#apidoc.module.copyfiles.toString" id="apidoc.module.copyfiles.toString">module copyfiles.toString</a></h1>
+
+
+    <h2>
+        <a href="#apidoc.element.copyfiles.toString.toString" id="apidoc.element.copyfiles.toString.toString">
+        function <span class="apidocSignatureSpan">copyfiles.</span>toString
+        <span class="apidocSignatureSpan">()</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">function toString() { [native code] }</pre></li>
+    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
+    </ul>
+
+
+</div>
+
+<div class="apidocFooterDiv">
+    [ this document was created with
+    <a href="https://github.com/kaizhu256/node-utility2" target="_blank">utility2</a>
+    ]
+</div>
+</div>
