@@ -1,4 +1,7 @@
-# api documentation for  [copyfiles (v1.2.0)](https://github.com/calvinmetcalf/copyfiles#readme)  [![npm package](https://img.shields.io/npm/v/npmdoc-copyfiles.svg?style=flat-square)](https://www.npmjs.org/package/npmdoc-copyfiles) [![travis-ci.org build-status](https://api.travis-ci.org/npmdoc/node-npmdoc-copyfiles.svg)](https://travis-ci.org/npmdoc/node-npmdoc-copyfiles)
+# npmdoc-copyfiles
+
+#### basic api documentation for  [copyfiles (v1.2.0)](https://github.com/calvinmetcalf/copyfiles#readme)  [![npm package](https://img.shields.io/npm/v/npmdoc-copyfiles.svg?style=flat-square)](https://www.npmjs.org/package/npmdoc-copyfiles) [![travis-ci.org build-status](https://api.travis-ci.org/npmdoc/node-npmdoc-copyfiles.svg)](https://travis-ci.org/npmdoc/node-npmdoc-copyfiles)
+
 #### copy some files
 
 [![NPM](https://nodei.co/npm/copyfiles.png?downloads=true&downloadRank=true&stars=true)](https://www.npmjs.com/package/copyfiles)
